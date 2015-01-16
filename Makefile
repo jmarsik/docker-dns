@@ -4,9 +4,10 @@
 USERNAME:=ncarlier
 APPNAME:=docker-dns
 IMAGE:=$(USERNAME)/$(APPNAME)
+# --privileged \
 
 define docker_run_flags
---privileged \
+--hostname='docker-dns' \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -p 53:53/udp
 endef
@@ -30,30 +31,38 @@ help:
 ## Build the image
 build:
 	echo "Building $(IMAGE) docker image..."
-	sudo docker build --rm -t $(IMAGE) .
+	docker build -t $(IMAGE) .
 
 ## Remove the image (also stop and delete the container)
 clean: stop rm
 	echo "Removing $(IMAGE) docker image..."
-	sudo docker rmi $(IMAGE)
+	docker rmi $(IMAGE)
 
 ## Run the container
 run:
 	echo "Running $(IMAGE) docker image..."
-	sudo docker run -d $(docker_run_flags) --name $(APPNAME) $(IMAGE)
+	docker run -d $(docker_run_flags) --name $(APPNAME) $(IMAGE)
+
+logs:
+	-docker logs --follow=true  $(APPNAME)
 
 ## Stop the container
 stop:
 	echo "Stopping container $(APPNAME) ..."
-	-sudo docker stop $(APPNAME)
+	-docker kill $(APPNAME)
+	-docker rm $(APPNAME)
 
 ## Delete the container
 rm:
 	echo "Deleting container $(APPNAME) ..."
-	-sudo docker rm $(APPNAME)
+	-docker rm $(APPNAME)
 
 ## Run the container with shell access
+explore:
+	echo "Running docker image $(IMAGE) as just a shell"
+	docker run --rm -it $(docker_run_flags) --entrypoint="/bin/bash" $(IMAGE) -c /bin/bash
+
 shell:
-	echo "Running $(IMAGE) docker image with shell access..."
-	sudo docker run --rm -it $(docker_run_flags) --entrypoint="/bin/bash" $(IMAGE) -c /bin/bash
+	echo "Running docker shell inside $(APPNAME)..."
+	docker exec -it $(APPNAME) /bin/bash
 
