@@ -1,7 +1,7 @@
 .SILENT :
 .PHONY : help build clean run stop rm shell
 
-USERNAME:=ncarlier
+USERNAME:=shabble
 APPNAME:=docker-dns
 IMAGE:=$(USERNAME)/$(APPNAME)
 # --privileged \
@@ -31,7 +31,7 @@ help:
 ## Build the image
 build:
 	echo "Building $(IMAGE) docker image..."
-	docker build -t $(IMAGE) .
+	docker --dns=8.8.8.8 build -t $(IMAGE) .
 
 ## Remove the image (also stop and delete the container)
 clean: stop rm
@@ -65,4 +65,7 @@ explore:
 shell:
 	echo "Running docker shell inside $(APPNAME)..."
 	docker exec -it $(APPNAME) /bin/bash
+
+dump:
+	docker exec -it $(APPNAME) /bin/cat /etc/dnsmasq.conf | uniq
 
