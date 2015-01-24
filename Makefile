@@ -4,11 +4,13 @@
 USERNAME:=shabble
 APPNAME:=docker-dns
 IMAGE:=$(USERNAME)/$(APPNAME)
-# --privileged \
 
 define docker_run_flags
 --hostname='docker-dns' \
 -v /var/run/docker.sock:/var/run/docker.sock \
+-v $(PWD)/dnsmasq.tmpl:/etc/dnsmasq.tmpl \
+-e DNS_ENVIRON=dev \
+-e DNS_ROOT=docker \
 -p 53:53/udp
 endef
 

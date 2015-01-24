@@ -1,4 +1,4 @@
-{{ $dns_root := hostEnviron "DNS_ROOT" }}
+{{ $dns_env_root := hostEnviron "DNS_ROOT" }}{{ $dns_root := or $dns_env_root "docker" }}
 auth-server={{ $dns_root }},docker0
 log-facility=-
 log-queries
@@ -19,6 +19,10 @@ server=8.8.8.8
 host-record={{ $name }},{{ $name }}.{{$dns_root}},{{ $internal_ip }}
 {{ if ne $hostname $name }}
 cname={{ $hostname }},{{ $name }}
+{{ end }}
+{{ with $dns_env := hostEnviron "DNS_ENVIRON" }}
+cname={{ $name }}.{{ $dns_env }}.{{ $dns_root }},{{ $name }}
+cname={{ $name }}.{{ $container.Image.Repository }}.{{ $dns_env }}.{{ $dns_root }},{{ $name }}
 {{ end }}
 # cname={{ stringHead $container.ID 12 }},{{ $hostname }}
 {{ end }}{{ end }}
