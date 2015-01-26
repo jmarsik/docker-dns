@@ -9,7 +9,7 @@ MAINTAINER Tom Feist <https://github.com/shabble>
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y curl dnsmasq psmisc supervisor
 #dnsutils vim
 
-ENV DOCKERGEN_URL https://github.com/shabble/docker-gen/releases/download/0.3.7/docker-gen-linux-amd64-0.3.7.tar.gz
+ENV DOCKERGEN_URL https://github.com/shabble/docker-gen/releases/download/0.3.8/docker-gen-linux-amd64-0.3.8.tar.gz
 
 RUN (cd /tmp && curl -L -o docker-gen.tgz $DOCKERGEN_URL && tar -C /usr/local/bin -xvzf docker-gen.tgz)
 
