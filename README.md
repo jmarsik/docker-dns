@@ -17,8 +17,8 @@ docker run \
 
 Environment variables:
 
-- DNS_ROOT - domain name used for generated DNS zone, default is _docker.local_
-- DNS_ENV - environment part of generated DNS zone records, default is empty
+- DNS_ROOT - domain name used for generated DNS zone, default is __docker.local__
+- DNS_ENV - environment part of generated DNS zone records, default is __empty__
 
 Multiple records are generated for each running container:
 
@@ -26,5 +26,5 @@ Multiple records are generated for each running container:
 - \<container name\>.\<root domain\>
 - \<container hostname including domain\>
 - when DNS_ENV environment variable is specified:
--- \<container name\>.\<environment\>.\<root domain\>
--- \<container name\>.\<container image repository\>.\<environment\>.\<root domain\>
+  - \<container name\>.\<environment\>.\<root domain\>
+  - \<container name\>.\<container image repository\>.\<environment\>.\<root domain\>
