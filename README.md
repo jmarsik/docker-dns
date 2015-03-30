@@ -22,9 +22,9 @@ Environment variables:
 
 Multiple records are generated for each running container:
 
-- <container name>
-- <container name>.<root domain>
-- <container hostname including domain>
+- \<container name\>
+- \<container name\>.\<root domain\>
+- \<container hostname including domain\>
 - when DNS_ENV environment variable is specified:
--- <container name>.<environment>.<root domain>
--- <container name>.<container image repository>.<environment>.<root domain>
+-- \<container name\>.\<environment\>.\<root domain\>
+-- \<container name\>.\<container image repository\>.\<environment\>.\<root domain\>
