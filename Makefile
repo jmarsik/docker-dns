@@ -1,17 +1,21 @@
 .SILENT :
 .PHONY : help build clean run stop rm shell
 
-USERNAME:=shabble
-APPNAME:=docker-dns
+USERNAME:=jmarsik
+APPNAME:=dns
 IMAGE:=$(USERNAME)/$(APPNAME)
 
 define docker_run_flags
---hostname='docker-dns' \
+--hostname='dns' \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $(PWD)/dnsmasq.tmpl:/etc/dnsmasq.tmpl \
--e DNS_ENVIRON=dev \
--e DNS_ROOT=docker \
--p 53:53/udp
+-e DNS_ROOT=docker.local \
+-e DNS_ENV=dev \
+-e DNS_FORWARDER=8.8.8.8 \
+-e DNS_AUTH_TTL=10 \
+-e DNS_LOG_QUERIES=1 \
+--expose=53/tcp \
+--expose=53/udp
 endef
 
 all: build
@@ -33,6 +37,8 @@ help:
 ## Build the image
 build:
 	echo "Building $(IMAGE) docker image..."
+# Use Google DNS for DNS queries when building, because Docker itself can be configured
+#  to use docker-dns container and it could be unavailable at this moment
 	docker --dns=8.8.8.8 build -t $(IMAGE) .
 
 ## Remove the image (also stop and delete the container)
@@ -46,11 +52,11 @@ run:
 	docker run -d $(docker_run_flags) --name $(APPNAME) $(IMAGE)
 
 logs:
-	-docker logs --follow=true  $(APPNAME)
+	-docker logs --follow=true $(APPNAME)
 
-## Stop the container
+## Stop and delete the container
 stop:
-	echo "Stopping container $(APPNAME) ..."
+	echo "Stopping and deleting container $(APPNAME) ..."
 	-docker kill $(APPNAME)
 	-docker rm $(APPNAME)
 
@@ -59,15 +65,16 @@ rm:
 	echo "Deleting container $(APPNAME) ..."
 	-docker rm $(APPNAME)
 
-## Run the container with shell access
+## Run new container with shell instead of supervisord
 explore:
 	echo "Running docker image $(IMAGE) as just a shell"
-	docker run --rm -it $(docker_run_flags) --entrypoint="/bin/bash" $(IMAGE) -c /bin/bash
+	docker run --rm -it $(docker_run_flags) $(IMAGE) bash
 
+## Enter running container shell to explore it while in operation
 shell:
 	echo "Running docker shell inside $(APPNAME)..."
 	docker exec -it $(APPNAME) /bin/bash
 
+## Show generated dnsmasq.conf
 dump:
 	docker exec -it $(APPNAME) /bin/cat /etc/dnsmasq.conf | uniq
-
